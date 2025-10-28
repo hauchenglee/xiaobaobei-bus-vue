@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://srv415056.hstgr.cloud:5001'
+const API_BASE_URL = 'http://srv415056.hstgr.cloud:5002'
 
 // 獲取預約資料
 export const getCacheData = async () => {
