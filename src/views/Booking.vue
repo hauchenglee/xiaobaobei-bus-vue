@@ -1,0 +1,1519 @@
+<template>
+    <div class="app-wrapper">
+        <!-- Loading 遮罩 -->
+        <div v-if="isLoading" class="loading-overlay">
+            <div class="loading-spinner"></div>
+        </div>
+
+        <!-- Toast 组件 -->
+        <div
+            v-if="showToast"
+            class="toast-container"
+            :class="{ 'toast-show': showToast }"
+        >
+            <div class="toast-content">
+                <span>{{ toastMessage }}</span>
+            </div>
+        </div>
+
+        <!-- 用戶設置模態窗口 -->
+        <div v-if="showUserModal" class="modal-overlay">
+            <div class="modal-container modal-container-large">
+                <div class="modal-header">
+                    <h2>用戶設置</h2>
+                    <button class="modal-close" @click="closeUserModal">×</button>
+                </div>
+                <div class="modal-content">
+                    <p class="modal-description">設定個人資料及常用地址，方便快速預約</p>
+
+                    <!-- 基本資料 -->
+                    <div class="settings-section">
+                        <h3>基本資料</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>姓名</label>
+                                <input
+                                    v-model="userSettings.user_name"
+                                    type="text"
+                                    class="form-input"
+                                    placeholder="請輸入姓名"
+                                />
+                            </div>
+                            <div class="form-group">
+                                <label>密碼</label>
+                                <input
+                                    v-model="userSettings.user_password"
+                                    type="password"
+                                    class="form-input"
+                                    placeholder="請輸入密碼"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 第一組地址設定 -->
+                    <div class="settings-section">
+                        <h3>常用路線設定1</h3>
+                        <div class="form-group">
+                            <label>路線名稱</label>
+                            <input
+                                v-model="userSettings.group1.name"
+                                type="text"
+                                class="form-input"
+                                placeholder="例如：家→復健中心"
+                            />
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>上車地區</label>
+                                <input
+                                    v-model="userSettings.group1.departureArea"
+                                    type="text"
+                                    class="form-input"
+                                    placeholder="請輸入上車地區"
+                                />
+                            </div>
+                            <div class="form-group">
+                                <label>上車地址</label>
+                                <input
+                                    v-model="userSettings.group1.departureAddress"
+                                    type="text"
+                                    class="form-input"
+                                    placeholder="請輸入上車地址"
+                                />
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>下車地區</label>
+                                <input
+                                    v-model="userSettings.group1.arrivalArea"
+                                    type="text"
+                                    class="form-input"
+                                    placeholder="請輸入下車地區"
+                                />
+                            </div>
+                            <div class="form-group">
+                                <label>下車地址</label>
+                                <input
+                                    v-model="userSettings.group1.arrivalAddress"
+                                    type="text"
+                                    class="form-input"
+                                    placeholder="請輸入下車地址"
+                                />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>路線備註</label>
+                            <textarea
+                                v-model="userSettings.group1.remark"
+                                class="form-input"
+                                rows="2"
+                                placeholder="請輸入路線相關備註"
+                            ></textarea>
+                        </div>
+                    </div>
+
+                    <!-- 第二組地址設定 -->
+                    <div class="settings-section">
+                        <h3>常用路線設定2</h3>
+                        <div class="form-group">
+                            <label>路線名稱</label>
+                            <input
+                                v-model="userSettings.group2.name"
+                                type="text"
+                                class="form-input"
+                                placeholder="例如：家→醫院"
+                            />
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>上車地區</label>
+                                <input
+                                    v-model="userSettings.group2.departureArea"
+                                    type="text"
+                                    class="form-input"
+                                    placeholder="請輸入上車地區"
+                                />
+                            </div>
+                            <div class="form-group">
+                                <label>上車地址</label>
+                                <input
+                                    v-model="userSettings.group2.departureAddress"
+                                    type="text"
+                                    class="form-input"
+                                    placeholder="請輸入上車地址"
+                                />
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>下車地區</label>
+                                <input
+                                    v-model="userSettings.group2.arrivalArea"
+                                    type="text"
+                                    class="form-input"
+                                    placeholder="請輸入下車地區"
+                                />
+                            </div>
+                            <div class="form-group">
+                                <label>下車地址</label>
+                                <input
+                                    v-model="userSettings.group2.arrivalAddress"
+                                    type="text"
+                                    class="form-input"
+                                    placeholder="請輸入下車地址"
+                                />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>路線備註</label>
+                            <textarea
+                                v-model="userSettings.group2.remark"
+                                class="form-input"
+                                rows="2"
+                                placeholder="請輸入路線相關備註"
+                            ></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline" @click="closeUserModal">取消</button>
+                    <button class="btn btn-primary" @click="saveUserSettings">確定</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 預約模態窗口 -->
+        <div v-if="showReservationModal" class="modal-overlay">
+            <div class="modal-container">
+                <div class="modal-header">
+                    <h2>{{ selectedDate }} 預約詳情</h2>
+                    <button class="modal-close" @click="closeReservationModal">×</button>
+                </div>
+                <div class="modal-content">
+                    <div class="form-group">
+                        <label>預約日期</label>
+                        <input
+                            v-model="reservationForm.booking_date"
+                            type="date"
+                            class="form-input"
+                            readonly
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label>預約時間</label>
+                        <input
+                            v-model="reservationForm.booking_time"
+                            type="time"
+                            class="form-input"
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label>執行預約日期</label>
+                        <input
+                            v-model="reservationForm.schedule_date"
+                            type="date"
+                            class="form-input"
+                            :min="dayAfterTomorrow"
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label>常用路線</label>
+                        <select
+                            v-model="selectedRouteGroup"
+                            @change="applyRouteGroup"
+                            class="select-input"
+                            required
+                        >
+                            <option value="" disabled>請選擇上車與下車地點</option>
+                            <option
+                                v-if="userSettings.group1.departureArea || userSettings.group1.departureAddress"
+                                value="group1"
+                            >
+                                {{ userSettings.group1.name || '常用路線1' }}
+                            </option>
+                            <option
+                                v-if="userSettings.group2.departureArea || userSettings.group2.departureAddress"
+                                value="group2"
+                            >
+                                {{ userSettings.group2.name || '常用路線2' }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- 路線詳情展開區域，包含地區、地址和備註 -->
+                    <div v-if="selectedRouteGroup && showRouteDetails" class="route-details-section">
+                        <div class="route-details-header">
+                            <h4>已選擇路線詳情</h4>
+                        </div>
+                        <div class="route-details-content">
+                            <div class="route-info-row">
+                                <div class="route-info-item">
+                                    <span class="route-label">上車地區：</span>
+                                    <span class="route-value">{{ reservationForm.departure_area }}</span>
+                                </div>
+                                <div class="route-info-item">
+                                    <span class="route-label">上車地址：</span>
+                                    <span class="route-value">{{ reservationForm.departure_address }}</span>
+                                </div>
+                            </div>
+                            <div class="route-info-row">
+                                <div class="route-info-item">
+                                    <span class="route-label">下車地區：</span>
+                                    <span class="route-value">{{ reservationForm.arrival_area }}</span>
+                                </div>
+                                <div class="route-info-item">
+                                    <span class="route-label">下車地址：</span>
+                                    <span class="route-value">{{ reservationForm.arrival_address }}</span>
+                                </div>
+                            </div>
+                            <div class="route-info-row">
+                                <div class="route-info-item route-info-full">
+                                    <span class="route-label">備註：</span>
+                                    <span class="route-value">{{ reservationForm.remark || '無' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button
+                        v-if="existingReservation"
+                        class="btn btn-danger"
+                        @click="deleteReservation"
+                    >
+                        刪除預約
+                    </button>
+                    <div class="modal-footer-right">
+                        <button class="btn btn-outline" @click="closeReservationModal">取消</button>
+                        <button class="btn btn-primary" @click="submitReservation">
+                            {{ existingReservation ? '更新預約' : '確認預約' }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-container">
+            <header>
+                <div class="header-content">
+                    <h1>{{ currentMonthDisplay }} 康復巴士自動化預約系統</h1>
+                    <div class="calendar-nav">
+                        <button class="nav-btn" @click="previousMonth">&lt;</button>
+                        <button class="nav-btn" @click="nextMonth">&gt;</button>
+                    </div>
+                </div>
+            </header>
+
+            <main class="editor-container">
+                <!-- 左側日曆面板 -->
+                <section class="editor-panel">
+                    <div class="panel-content">
+                        <div class="calendar-container">
+                            <div class="weekdays">
+                                <div class="weekday" v-for="day in weekdays" :key="day">{{ day }}</div>
+                            </div>
+                            <div class="calendar-grid">
+                                <div
+                                    v-for="date in calendarDates"
+                                    :key="date.key"
+                                    :class="getDateClass(date)"
+                                    @click="selectDate(date)"
+                                >
+                                    <span class="date-number">{{ date.day }}</span>
+                                    <div v-if="date.reservation" class="reservation-dot"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="divider"></div>
+
+                <!-- 右側預約列表面板 -->
+                <section class="editor-panel">
+                    <div class="panel-content">
+                        <div v-if="monthReservations.length > 0" class="reservations-list">
+                            <div
+                                v-for="reservation in monthReservations"
+                                :key="reservation.booking_date"
+                                class="reservation-item"
+                            >
+                                <div class="reservation-content" @click="viewReservation(reservation)">
+                                    <div class="reservation-date">{{ formatDate(reservation.booking_date) }}</div>
+                                    <div class="reservation-details">
+                                        <div class="reservation-trip">{{ reservation.booking_time || '未設定時間' }}</div>
+                                        <div class="reservation-route">
+                                            {{ reservation.departure_address }} → {{ reservation.arrival_address }}
+                                        </div>
+                                        <div class="reservation-execute">
+                                            執行日期：{{ formatDate(reservation.schedule_date) }}
+                                        </div>
+                                        <div v-if="reservation.remark" class="reservation-remark">
+                                            備註：{{ reservation.remark }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="reservation-actions">
+                                    <button
+                                        class="btn-delete"
+                                        @click.stop="deleteReservationFromList(reservation)"
+                                        title="刪除預約"
+                                    >
+                                        ×
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-else class="no-errors">
+                            <p>本月暫無預約記錄</p>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <footer class="action-bar">
+                <div class="font-size-controls">
+                    <button
+                        v-for="size in fontSizes"
+                        :key="size.value"
+                        :class="['btn', 'btn-font', currentFontSize === size.value ? 'btn-font-active' : '']"
+                        @click="setFontSize(size.value)"
+                    >
+                        {{ size.label }}
+                    </button>
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-outline" @click="openUserModal">
+                        用戶設置
+                    </button>
+                    <button class="btn btn-primary" @click="loadCacheData">
+                        載入資料
+                    </button>
+                </div>
+            </footer>
+        </div>
+    </div>
+</template>
+
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { getCacheData, updateCacheData } from '../services/api.js'
+
+// 基本狀態
+const isLoading = ref(false)
+const showToast = ref(false)
+const toastMessage = ref('')
+
+// 模態窗口狀態
+const showUserModal = ref(false)
+const showReservationModal = ref(false)
+
+// 日曆狀態
+const currentDate = ref(new Date())
+const selectedDate = ref('')
+const today = new Date()
+const tomorrow = new Date(today)
+tomorrow.setDate(today.getDate() + 1)
+const dayAfterTomorrow = computed(() => {
+    const date = new Date(today)
+    date.setDate(today.getDate() + 2)
+    return date.toISOString().split('T')[0]
+})
+
+// 字體大小控制
+const fontSizes = [
+    {label: '小', value: '1.25rem'},
+    {label: '中', value: '1.5rem'},
+    {label: '大', value: '2rem'},
+    {label: '特大', value: '3rem'}
+];
+const currentFontSize = ref('1.5rem');
+
+// 用戶設置
+const userSettings = ref({
+    user_name: '房有',
+    user_password: 'A078839',
+    // 第一組地址
+    group1: {
+        name: '土城上車，三峽下車',
+        departureArea: '土城',
+        departureAddress: '裕民路61巷9號',
+        arrivalArea: '三峽',
+        arrivalAddress: '大埔路220號-春暉啟能中心',
+        remark: ''
+    },
+    // 第二組地址
+    group2: {
+        name: '三峽上車，土城下車',
+        departureArea: '三峽',
+        departureAddress: '大埔路220號-春暉啟能中心',
+        arrivalArea: '土城',
+        arrivalAddress: '裕民路61巷9號',
+        remark: ''
+    }
+})
+
+// 預約表單
+const reservationForm = ref({
+    booking_date: '',
+    booking_time: '09:00',
+    departure_area: '',
+    departure_address: '',
+    arrival_area: '',
+    arrival_address: '',
+    schedule_date: '',
+    remark: ''
+})
+
+// 加入路線選擇狀態
+const selectedRouteGroup = ref('')
+
+const showRouteDetails = ref(false) // **新增：控制路線詳情展開狀態**
+
+// 加入應用路線組合的方法
+const applyRouteGroup = () => {
+    if (!selectedRouteGroup.value) {
+        showRouteDetails.value = false
+        return
+    }
+
+    const group = userSettings.value[selectedRouteGroup.value]
+    if (group) {
+        reservationForm.value.departure_area = group.departureArea
+        reservationForm.value.departure_address = group.departureAddress
+        reservationForm.value.arrival_area = group.arrivalArea
+        reservationForm.value.arrival_address = group.arrivalAddress
+
+        // 如果群組有備註且表單備註為空，則使用群組備註
+        if (group.remark && !reservationForm.value.remark) {
+            reservationForm.value.remark = group.remark
+        }
+
+        showRouteDetails.value = true // **新增：選擇路線後展開詳情**
+    }
+}
+
+// 編輯狀態
+const existingReservation = ref(null)
+
+// 預約數據
+const reservations = ref([])
+
+// 計算屬性
+const currentMonthDisplay = computed(() => {
+    return `${currentDate.value.getFullYear()}年${currentDate.value.getMonth() + 1}月`
+})
+
+const monthReservations = computed(() => {
+    const year = currentDate.value.getFullYear()
+    const month = currentDate.value.getMonth() + 1
+    return reservations.value.filter(r => {
+        if (!r.booking_date) return false
+        const [rYear, rMonth] = r.booking_date.split('-').map(Number)
+        return rYear === year && rMonth === month
+    })
+})
+
+const weekdays = ['日', '一', '二', '三', '四', '五', '六']
+
+const calendarDates = computed(() => {
+    const year = currentDate.value.getFullYear()
+    const month = currentDate.value.getMonth()
+    const firstDay = new Date(year, month, 1)
+    const lastDay = new Date(year, month + 1, 0)
+    const startDate = new Date(firstDay)
+    startDate.setDate(startDate.getDate() - firstDay.getDay())
+
+    const dates = []
+    const current = new Date(startDate)
+
+    for (let i = 0; i < 42; i++) {
+        const dateStr = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}-${String(current.getDate()).padStart(2, '0')}`
+        const reservation = reservations.value.find(r => r.booking_date === dateStr)
+
+        // 不能預約今天、明天及過去的日期
+        const isNotBookable = current <= tomorrow
+
+        dates.push({
+            day: current.getDate(),
+            date: dateStr,
+            isCurrentMonth: current.getMonth() === month,
+            isToday: dateStr === today.toISOString().split('T')[0],
+            isTomorrow: dateStr === tomorrow.toISOString().split('T')[0],
+            isNotBookable: isNotBookable,
+            reservation: reservation,
+            key: `${current.getFullYear()}-${current.getMonth()}-${current.getDate()}`
+        })
+
+        current.setDate(current.getDate() + 1)
+    }
+
+    return dates
+})
+
+// 方法
+const setFontSize = (size) => {
+    currentFontSize.value = size;
+}
+
+const showToastMessage = (message, duration = 2000) => {
+    toastMessage.value = message
+    showToast.value = true
+    setTimeout(() => {
+        showToast.value = false
+    }, duration)
+}
+
+const openUserModal = () => {
+    showUserModal.value = true
+}
+
+const closeUserModal = () => {
+    showUserModal.value = false
+}
+
+const saveUserSettings = async () => {
+    try {
+        isLoading.value = true
+
+        // 構建要更新的緩存數據
+        const cacheData = {
+            user_name: userSettings.value.user_name,
+            user_password: userSettings.value.user_password,
+            booking_schedules: reservations.value
+        }
+
+        await updateCacheData(cacheData)
+        showToastMessage('用戶設置已保存')
+        closeUserModal()
+    } catch (error) {
+        showToastMessage('保存用戶設置失敗')
+    } finally {
+        isLoading.value = false
+    }
+}
+
+const loadCacheData = async () => {
+    try {
+        isLoading.value = true
+        const response = await getCacheData()
+
+        if (response.success) {
+            const data = response.data
+
+            // 更新用戶設置
+            if (data.user_name) {
+                userSettings.value.user_name = data.user_name
+            }
+            if (data.user_password) {
+                userSettings.value.user_password = data.user_password
+            }
+
+            // 直接使用預約數據，不處理狀態
+            reservations.value = data.booking_schedules || []
+
+            showToastMessage('資料載入成功')
+        } else {
+            showToastMessage('載入資料失敗')
+        }
+    } catch (error) {
+        console.error('載入緩存資料失敗:', error)
+        showToastMessage('載入資料失敗')
+    } finally {
+        isLoading.value = false
+    }
+}
+
+const selectDate = (date) => {
+    if (!date.isCurrentMonth || date.isNotBookable) return
+
+    selectedDate.value = date.date
+    existingReservation.value = date.reservation
+    selectedRouteGroup.value = '' // 重置路線選擇
+    showRouteDetails.value = false // **新增：重置展開狀態**
+
+    if (date.reservation) {
+        // 根據現有預約數據設定路線選擇
+        if (date.reservation.departure_area === userSettings.value.group1.departureArea &&
+            date.reservation.departure_address === userSettings.value.group1.departureAddress) {
+            selectedRouteGroup.value = 'group1'
+            showRouteDetails.value = true
+        } else if (date.reservation.departure_area === userSettings.value.group2.departureArea &&
+            date.reservation.departure_address === userSettings.value.group2.departureAddress) {
+            selectedRouteGroup.value = 'group2'
+            showRouteDetails.value = true
+        }
+    } else {
+        // 新建預約，使用第一組地址作為預設值
+        reservationForm.value = {
+            booking_date: date.date,
+            booking_time: '09:00',
+            departure_area: userSettings.value.group1.departureArea,
+            departure_address: userSettings.value.group1.departureAddress,
+            arrival_area: userSettings.value.group1.arrivalArea,
+            arrival_address: userSettings.value.group1.arrivalAddress,
+            schedule_date: dayAfterTomorrow.value,
+            remark: ''
+        }
+    }
+
+    showReservationModal.value = true
+}
+
+const closeReservationModal = () => {
+    showReservationModal.value = false
+}
+
+const submitReservation = async () => {
+    // 簡單驗證常用路線必選
+    if (!selectedRouteGroup.value) {
+        showToastMessage('請選擇常用路線')
+        return
+    }
+    
+    // 驗證執行日期不能是今天或明天
+    const executeDate = new Date(reservationForm.value.schedule_date)
+    if (executeDate <= tomorrow) {
+        showToastMessage('執行預約日期不能是今天或明天')
+        return
+    }
+
+    try {
+        isLoading.value = true
+
+        if (existingReservation.value) {
+            // 更新現有預約
+            const index = reservations.value.findIndex(r => r.booking_date === selectedDate.value)
+            if (index !== -1) {
+                reservations.value[index] = { ...reservationForm.value }
+            }
+        } else {
+            // 新增預約
+            reservations.value.push({ ...reservationForm.value })
+        }
+
+        // 統一使用 updateCacheData 同步到服務器
+        const cacheData = {
+            user_name: userSettings.value.user_name,
+            user_password: userSettings.value.user_password,
+            booking_schedules: reservations.value
+        }
+
+        const response = await updateCacheData(cacheData)
+
+        if (response.success) {
+            showToastMessage(response.message || '預約已提交')
+        } else {
+            showToastMessage('預約失敗')
+        }
+
+        closeReservationModal()
+    } catch (error) {
+        console.error('提交預約失敗:', error)
+        showToastMessage('提交預約失敗')
+    } finally {
+        isLoading.value = false
+    }
+}
+
+const deleteReservation = async () => {
+    if (!existingReservation.value) return
+
+    try {
+        isLoading.value = true
+
+        // 從本地數據中移除預約
+        const index = reservations.value.findIndex(r => r.booking_date === selectedDate.value)
+        if (index !== -1) {
+            reservations.value.splice(index, 1)
+        }
+
+        // 同步到服務器
+        const cacheData = {
+            user_name: userSettings.value.user_name,
+            user_password: userSettings.value.user_password,
+            booking_schedules: reservations.value
+        }
+
+        const response = await updateCacheData(cacheData)
+
+        if (response.success) {
+            showToastMessage('預約已刪除')
+        } else {
+            showToastMessage('刪除預約失敗')
+        }
+
+        closeReservationModal()
+    } catch (error) {
+        console.error('刪除預約失敗:', error)
+        showToastMessage('刪除預約失敗')
+    } finally {
+        isLoading.value = false
+    }
+}
+
+const deleteReservationFromList = async (reservation) => {
+    try {
+        isLoading.value = true
+
+        // 從本地數據中移除預約
+        const index = reservations.value.findIndex(r => r.booking_date === reservation.booking_date)
+        if (index !== -1) {
+            reservations.value.splice(index, 1)
+        }
+
+        // 同步到服務器
+        const cacheData = {
+            user_name: userSettings.value.user_name,
+            user_password: userSettings.value.user_password,
+            booking_schedules: reservations.value
+        }
+
+        const response = await updateCacheData(cacheData)
+
+        if (response.success) {
+            showToastMessage('預約已刪除')
+        } else {
+            showToastMessage('刪除預約失敗')
+        }
+    } catch (error) {
+        console.error('刪除預約失敗:', error)
+        showToastMessage('刪除預約失敗')
+    } finally {
+        isLoading.value = false
+    }
+}
+
+const viewReservation = (reservation) => {
+    selectedDate.value = reservation.booking_date
+    existingReservation.value = reservation
+    reservationForm.value = { ...reservation }
+    showReservationModal.value = true
+}
+
+const previousMonth = () => {
+    currentDate.value = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() - 1)
+}
+
+const nextMonth = () => {
+    currentDate.value = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1)
+}
+
+const formatDate = (dateStr) => {
+    if (!dateStr) return ''
+    const date = new Date(dateStr)
+    return `${date.getMonth() + 1}/${date.getDate()}`
+}
+
+const getDateClass = (date) => {
+    const classes = ['calendar-date']
+
+    if (!date.isCurrentMonth) classes.push('other-month')
+    if (date.isToday) classes.push('today')
+    if (date.isTomorrow) classes.push('tomorrow')
+    if (date.isNotBookable) classes.push('not-bookable')
+    if (date.reservation) classes.push('has-reservation')
+    if (date.isCurrentMonth && !date.isNotBookable) classes.push('selectable')
+
+    return classes
+}
+
+// 組件掛載時載入數據
+onMounted(() => {
+    loadCacheData()
+})
+</script>
+
+<style scoped>
+/* 保持原有樣式不變 */
+.app-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    overflow: hidden;
+}
+
+.glass-container {
+    width: 95vw;
+    height: 90vh;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: 24px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+}
+
+header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.calendar-nav {
+    display: flex;
+    gap: 0.5rem;
+}
+
+h1 {
+    color: #333;
+    font-size: 1.5rem;
+    font-weight: 500;
+    text-align: center;
+    margin: 0;
+    letter-spacing: 0.5px;
+    flex: 1; /* 讓標題占據中間空間，保持置中 */
+}
+
+.editor-container {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    position: relative;
+}
+
+.editor-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.nav-btn {
+    padding: 0.25rem 0.5rem;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.nav-btn:hover {
+    background: #f5f5f5;
+}
+
+.panel-content {
+    flex: 1;
+    padding: 1.5rem;
+    color: #2c3e50;
+    font-size: v-bind(currentFontSize);
+    line-height: 2;
+    overflow-y: auto;
+    letter-spacing: 0.3px;
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.panel-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.panel-content::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.panel-content::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+}
+
+.panel-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.calendar-container {
+    max-width: 100%;
+}
+
+.weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.weekday {
+    text-align: center;
+    font-weight: 500;
+    color: #666;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+}
+
+.calendar-date {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+    position: relative;
+    padding: 0.25rem;
+    min-height: 60px;
+}
+
+.calendar-date.selectable {
+    cursor: pointer;
+    border-color: #e5e7eb;
+}
+
+.calendar-date.selectable:hover {
+    background: #f9fafb;
+    border-color: #3b82f6;
+}
+
+.calendar-date.other-month {
+    color: #ccc;
+}
+
+.calendar-date.not-bookable {
+    color: #999;
+    background: #f5f5f5;
+}
+
+.calendar-date.today {
+    background: #dbeafe;
+    border-color: #3b82f6;
+    color: #1e40af;
+    font-weight: 600;
+}
+
+.calendar-date.tomorrow {
+    background: #fef3c7;
+    border-color: #f59e0b;
+    color: #92400e;
+    font-weight: 500;
+}
+
+.calendar-date.has-reservation {
+    background: #dcfce7;
+    border-color: #16a34a;
+}
+
+.date-number {
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+}
+
+.reservation-dot {
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    background: #10b981;
+    border-radius: 50%;
+}
+
+.divider {
+    width: 1px;
+    background: linear-gradient(
+        to bottom,
+        transparent,
+        rgba(0, 0, 0, 0.1),
+        transparent
+    );
+}
+
+.reservations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.reservation-item {
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.reservation-item:hover {
+    background: #f9fafb;
+    border-color: #3b82f6;
+}
+
+.reservation-content {
+    flex: 1;
+    cursor: pointer;
+}
+
+.reservation-actions {
+    margin-left: 1rem;
+}
+
+.btn-delete {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #dc2626;
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+    transition: all 0.2s ease;
+}
+
+.btn-delete:hover {
+    background: #b91c1c;
+    transform: scale(1.1);
+}
+
+.reservation-date {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.reservation-details {
+    margin-bottom: 0.5rem;
+}
+
+.reservation-trip {
+    font-size: 0.875rem;
+    color: #666;
+    margin-bottom: 0.25rem;
+}
+
+.reservation-route {
+    font-size: 0.875rem;
+    color: #333;
+    margin-bottom: 0.25rem;
+}
+
+.reservation-execute {
+    font-size: 0.75rem;
+    color: #888;
+    margin-bottom: 0.25rem;
+}
+
+.reservation-remark {
+    font-size: 0.75rem;
+    color: #666;
+}
+
+.no-errors {
+    text-align: center;
+    color: #666;
+    padding: 2rem;
+}
+
+.action-bar {
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.font-size-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-font {
+    padding: 0.4rem 0.8rem;
+    background: white;
+    color: #666;
+    border: 1px solid #ddd;
+    font-size: 0.85rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-font:hover {
+    background: #f5f5f5;
+}
+
+.btn-font-active {
+    background: #e5e7eb;
+    color: #333;
+    border-color: #999;
+}
+
+.button-group {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.btn {
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    border: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background: #3b82f6;
+    color: white;
+    border: 1px solid transparent;
+}
+
+.btn-primary:hover {
+    background: #2563eb;
+}
+
+.btn-danger {
+    background: #dc2626;
+    color: white;
+    border: 1px solid #dc2626;
+}
+
+.btn-danger:hover {
+    background: #b91c1c;
+}
+
+.btn-outline {
+    background: white;
+    color: #3b82f6;
+    border: 1px solid #3b82f6;
+}
+
+.btn-outline:hover {
+    background: #eff6ff;
+}
+
+/* 模態窗口樣式 */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-container {
+    background: white;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #333;
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #666;
+    cursor: pointer;
+    padding: 0.5rem;
+    margin: -0.5rem;
+    line-height: 1;
+}
+
+.modal-content {
+    padding: 1.5rem;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.modal-description {
+    color: #666;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.form-input, .select-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.form-input:focus, .select-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.form-input[readonly] {
+    background: #f9fafb;
+    color: #666;
+}
+
+textarea.form-input {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.modal-footer {
+    padding: 1.25rem 1.5rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-footer-right {
+    display: flex;
+    gap: 1rem;
+}
+
+/* Loading 樣式 */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Toast 樣式 */
+.toast-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    z-index: 1001;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.toast-show {
+    transform: translateX(-50%) translateY(-50%);
+    opacity: 1;
+}
+
+.toast-content {
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
+    backdrop-filter: blur(8px);
+}
+
+/* 新增用戶設置相關樣式 */
+.modal-container-large {
+    max-width: 800px;
+    max-height: 90vh;
+}
+
+.settings-section {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.settings-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.settings-section h3 {
+    color: #333;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-container-large {
+        width: 95%;
+        margin: 1rem;
+    }
+}
+
+/* **新增：路線詳情展開區域樣式** */
+.route-details-section {
+    margin: 1rem 0;
+    padding: 1rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    animation: slideDown 0.3s ease-out;
+}
+
+.route-details-header {
+    margin-bottom: 0.75rem;
+}
+
+.route-details-header h4 {
+    color: #475569;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.route-details-header h4::before {
+    content: "📍";
+    margin-right: 0.5rem;
+}
+
+.route-details-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.route-info-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.route-info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.route-info-full {
+    grid-column: 1 / -1;
+}
+
+.route-label {
+    font-size: 0.8rem;
+    color: #64748b;
+    font-weight: 500;
+    min-width: 60px;
+    flex-shrink: 0;
+}
+
+.route-value {
+    font-size: 0.8rem;
+    color: #334155;
+    word-break: break-word;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+        max-height: 0;
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        max-height: 200px;
+    }
+}
+
+@media (max-width: 768px) {
+    .route-info-row {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .route-info-item {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+}
+</style>
