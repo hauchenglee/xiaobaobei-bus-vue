@@ -17,7 +17,7 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0',    // 允許外部訪問
-    port: 5173,         // 指定端口
+    port: 5174,         // 指定端口
     strictPort: true,   // 如果端口被占用，直接報錯
     cors: true,
     allowedHosts: [
@@ -27,7 +27,7 @@ export default defineConfig({
     ],
     hmr: {
       host: 'srv415056.hstgr.cloud',
-      port: 5173,
+      port: 5174,
       protocol: 'http'
     },
     headers: {
