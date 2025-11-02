@@ -51,23 +51,27 @@
                         </div>
                     </div>
 
-                    <!-- 第一組地址設定 -->
-                    <div class="settings-section">
-                        <h3>常用路線設定1</h3>
+                    <!-- 動態生成路線設定區塊 - 改動位置 -->
+                    <div
+                        v-for="(group, groupKey) in routeGroups"
+                        :key="groupKey"
+                        class="settings-section"
+                    >
+                        <h3>常用路線設定{{ groupKey.replace('group', '') }}</h3>
                         <div class="form-group">
                             <label>路線名稱</label>
                             <input
-                                v-model="userSettings.group1.name"
+                                v-model="userSettings[groupKey].name"
                                 type="text"
                                 class="form-input"
-                                placeholder="例如：家→復健中心"
+                                :placeholder="getRoutePlaceholder(groupKey)"
                             />
                         </div>
                         <div class="form-row">
                             <div class="form-group">
                                 <label>上車地區</label>
                                 <input
-                                    v-model="userSettings.group1.departureArea"
+                                    v-model="userSettings[groupKey].departureArea"
                                     type="text"
                                     class="form-input"
                                     placeholder="請輸入上車地區"
@@ -76,7 +80,7 @@
                             <div class="form-group">
                                 <label>上車地址</label>
                                 <input
-                                    v-model="userSettings.group1.departureAddress"
+                                    v-model="userSettings[groupKey].departureAddress"
                                     type="text"
                                     class="form-input"
                                     placeholder="請輸入上車地址"
@@ -87,7 +91,7 @@
                             <div class="form-group">
                                 <label>下車地區</label>
                                 <input
-                                    v-model="userSettings.group1.arrivalArea"
+                                    v-model="userSettings[groupKey].arrivalArea"
                                     type="text"
                                     class="form-input"
                                     placeholder="請輸入下車地區"
@@ -96,7 +100,7 @@
                             <div class="form-group">
                                 <label>下車地址</label>
                                 <input
-                                    v-model="userSettings.group1.arrivalAddress"
+                                    v-model="userSettings[groupKey].arrivalAddress"
                                     type="text"
                                     class="form-input"
                                     placeholder="請輸入下車地址"
@@ -106,70 +110,7 @@
                         <div class="form-group">
                             <label>路線備註</label>
                             <textarea
-                                v-model="userSettings.group1.remark"
-                                class="form-input"
-                                rows="2"
-                                placeholder="請輸入路線相關備註"
-                            ></textarea>
-                        </div>
-                    </div>
-
-                    <!-- 第二組地址設定 -->
-                    <div class="settings-section">
-                        <h3>常用路線設定2</h3>
-                        <div class="form-group">
-                            <label>路線名稱</label>
-                            <input
-                                v-model="userSettings.group2.name"
-                                type="text"
-                                class="form-input"
-                                placeholder="例如：家→醫院"
-                            />
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>上車地區</label>
-                                <input
-                                    v-model="userSettings.group2.departureArea"
-                                    type="text"
-                                    class="form-input"
-                                    placeholder="請輸入上車地區"
-                                />
-                            </div>
-                            <div class="form-group">
-                                <label>上車地址</label>
-                                <input
-                                    v-model="userSettings.group2.departureAddress"
-                                    type="text"
-                                    class="form-input"
-                                    placeholder="請輸入上車地址"
-                                />
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>下車地區</label>
-                                <input
-                                    v-model="userSettings.group2.arrivalArea"
-                                    type="text"
-                                    class="form-input"
-                                    placeholder="請輸入下車地區"
-                                />
-                            </div>
-                            <div class="form-group">
-                                <label>下車地址</label>
-                                <input
-                                    v-model="userSettings.group2.arrivalAddress"
-                                    type="text"
-                                    class="form-input"
-                                    placeholder="請輸入下車地址"
-                                />
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>路線備註</label>
-                            <textarea
-                                v-model="userSettings.group2.remark"
+                                v-model="userSettings[groupKey].remark"
                                 class="form-input"
                                 rows="2"
                                 placeholder="請輸入路線相關備註"
@@ -227,17 +168,13 @@
                             required
                         >
                             <option value="" disabled>請選擇上車與下車地點</option>
+                            <!-- 動態生成選項 - 改動位置 -->
                             <option
-                                v-if="userSettings.group1.departureArea || userSettings.group1.departureAddress"
-                                value="group1"
+                                v-for="(group, groupKey) in availableRouteGroups"
+                                :key="groupKey"
+                                :value="groupKey"
                             >
-                                {{ userSettings.group1.name || '常用路線1' }}
-                            </option>
-                            <option
-                                v-if="userSettings.group2.departureArea || userSettings.group2.departureAddress"
-                                value="group2"
-                            >
-                                {{ userSettings.group2.name || '常用路線2' }}
+                                {{ group.name || `常用路線${groupKey.replace('group', '')}` }}
                             </option>
                         </select>
                     </div>
@@ -437,28 +374,71 @@ const userSettings = ref({
     user_password: 'A078839',
     // 第一組地址
     group1: {
-        name: '土城上車，三峽下車',
+        name: '裕民路上車，三峽下車',
         departureArea: '土城',
         departureAddress: '裕民路61巷9號',
         arrivalArea: '三峽',
         arrivalAddress: '大埔路220號-春暉啟能中心',
-        remark: ''
+        remark: '可06:30~10:00之間，悠遊卡付款'
     },
     // 第二組地址
     group2: {
-        name: '三峽上車，土城下車',
+        name: '三峽上車，裕民路下車',
         departureArea: '三峽',
         departureAddress: '大埔路220號-春暉啟能中心',
         arrivalArea: '土城',
         arrivalAddress: '裕民路61巷9號',
-        remark: ''
+        remark: '可14:00~16:00之間，悠遊卡付款'
+    },
+    // 第三組地址
+    group3: {
+        name: '三峽上車，永和街下車',
+        departureArea: '三峽',
+        departureAddress: '大埔路220號-春暉啟能中心',
+        arrivalArea: '土城',
+        arrivalAddress: '永和街61號',
+        remark: '可14:00~16:00之間，悠遊卡付款'
     }
 })
+
+// 新增：動態路線組合計算屬性 - 改動位置
+const routeGroups = computed(() => {
+    const groups = {}
+    Object.keys(userSettings.value).forEach(key => {
+        if (key.startsWith('group') && typeof userSettings.value[key] === 'object') {
+            groups[key] = userSettings.value[key]
+        }
+    })
+    return groups
+})
+
+// 新增：可用路線組合計算屬性 - 改動位置
+const availableRouteGroups = computed(() => {
+    const groups = {}
+    Object.keys(routeGroups.value).forEach(groupKey => {
+        const group = routeGroups.value[groupKey]
+        if (group.departureArea || group.departureAddress) {
+            groups[groupKey] = group
+        }
+    })
+    return groups
+})
+
+// 新增：路線占位符方法 - 改動位置
+const getRoutePlaceholder = (groupKey) => {
+    const groupNumber = groupKey.replace('group', '')
+    const placeholders = {
+        '1': '例如：家→復健中心',
+        '2': '例如：家→醫院',
+        '3': '例如：家→工作地點'
+    }
+    return placeholders[groupNumber] || `例如：路線${groupNumber}`
+}
 
 // 預約表單
 const reservationForm = ref({
     booking_date: '',
-    booking_time: '09:00',
+    booking_time: '07:15',
     departure_area: '',
     departure_address: '',
     arrival_area: '',
@@ -470,7 +450,7 @@ const reservationForm = ref({
 // 加入路線選擇狀態
 const selectedRouteGroup = ref('')
 
-const showRouteDetails = ref(false) // **新增：控制路線詳情展開狀態**
+const showRouteDetails = ref(false)
 
 // 加入應用路線組合的方法
 const applyRouteGroup = () => {
@@ -491,7 +471,7 @@ const applyRouteGroup = () => {
             reservationForm.value.remark = group.remark
         }
 
-        showRouteDetails.value = true // **新增：選擇路線後展開詳情**
+        showRouteDetails.value = true
     }
 }
 
@@ -626,34 +606,47 @@ const loadCacheData = async () => {
     }
 }
 
+// 新增：動態查找路線組的方法 - 改動位置
+const findMatchingRouteGroup = (reservation) => {
+    for (const [groupKey, group] of Object.entries(routeGroups.value)) {
+        if (group.departureArea === reservation.departure_area &&
+            group.departureAddress === reservation.departure_address) {
+            return groupKey
+        }
+    }
+    return null
+}
+
 const selectDate = (date) => {
     if (!date.isCurrentMonth || date.isNotBookable) return
 
     selectedDate.value = date.date
     existingReservation.value = date.reservation
     selectedRouteGroup.value = '' // 重置路線選擇
-    showRouteDetails.value = false // **新增：重置展開狀態**
+    showRouteDetails.value = false
 
     if (date.reservation) {
-        // 根據現有預約數據設定路線選擇
-        if (date.reservation.departure_area === userSettings.value.group1.departureArea &&
-            date.reservation.departure_address === userSettings.value.group1.departureAddress) {
-            selectedRouteGroup.value = 'group1'
-            showRouteDetails.value = true
-        } else if (date.reservation.departure_area === userSettings.value.group2.departureArea &&
-            date.reservation.departure_address === userSettings.value.group2.departureAddress) {
-            selectedRouteGroup.value = 'group2'
+        // 動態查找匹配的路線組 - 改動位置
+        const matchingGroup = findMatchingRouteGroup(date.reservation)
+        if (matchingGroup) {
+            selectedRouteGroup.value = matchingGroup
             showRouteDetails.value = true
         }
+
+        // 填充預約表單
+        reservationForm.value = { ...date.reservation }
     } else {
-        // 新建預約，使用第一組地址作為預設值
+        // 新建預約，使用第一個可用路線作為預設值 - 改動位置
+        const firstAvailableGroup = Object.keys(availableRouteGroups.value)[0]
+        const defaultGroup = firstAvailableGroup ? userSettings.value[firstAvailableGroup] : userSettings.value.group1
+
         reservationForm.value = {
             booking_date: date.date,
-            booking_time: '09:00',
-            departure_area: userSettings.value.group1.departureArea,
-            departure_address: userSettings.value.group1.departureAddress,
-            arrival_area: userSettings.value.group1.arrivalArea,
-            arrival_address: userSettings.value.group1.arrivalAddress,
+            booking_time: '07:15',
+            departure_area: defaultGroup.departureArea || '',
+            departure_address: defaultGroup.departureAddress || '',
+            arrival_area: defaultGroup.arrivalArea || '',
+            arrival_address: defaultGroup.arrivalAddress || '',
             schedule_date: dayAfterTomorrow.value,
             remark: ''
         }
@@ -672,7 +665,7 @@ const submitReservation = async () => {
         showToastMessage('請選擇常用路線')
         return
     }
-    
+
     // 驗證執行日期不能是今天或明天
     const executeDate = new Date(reservationForm.value.schedule_date)
     if (executeDate <= tomorrow) {
@@ -790,6 +783,14 @@ const viewReservation = (reservation) => {
     selectedDate.value = reservation.booking_date
     existingReservation.value = reservation
     reservationForm.value = { ...reservation }
+
+    // 動態查找匹配的路線組 - 改動位置
+    const matchingGroup = findMatchingRouteGroup(reservation)
+    if (matchingGroup) {
+        selectedRouteGroup.value = matchingGroup
+        showRouteDetails.value = true
+    }
+
     showReservationModal.value = true
 }
 
@@ -1428,7 +1429,7 @@ textarea.form-input {
     }
 }
 
-/* **新增：路線詳情展開區域樣式** */
+/* 路線詳情展開區域樣式 */
 .route-details-section {
     margin: 1rem 0;
     padding: 1rem;
