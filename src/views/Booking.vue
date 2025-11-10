@@ -67,6 +67,15 @@
                                 :placeholder="getRoutePlaceholder(groupKey)"
                             />
                         </div>
+                        <div class="form-group">
+                            <label>預約時間</label>
+                            <input
+                                v-model="userSettings[groupKey].booking_time"
+                                type="time"
+                                class="form-input"
+                                placeholder="請輸入預約時間"
+                            />
+                        </div>
                         <div class="form-row">
                             <div class="form-group">
                                 <label>上車地區</label>
@@ -143,20 +152,11 @@
                         />
                     </div>
                     <div class="form-group">
-                        <label>預約時間</label>
-                        <input
-                            v-model="reservationForm.booking_time"
-                            type="time"
-                            class="form-input"
-                        />
-                    </div>
-                    <div class="form-group">
                         <label>執行預約日期</label>
                         <input
                             v-model="reservationForm.schedule_date"
                             type="date"
                             class="form-input"
-                            :min="dayAfterTomorrow"
                         />
                     </div>
                     <div class="form-group">
@@ -185,6 +185,17 @@
                             <h4>已選擇路線詳情</h4>
                         </div>
                         <div class="route-details-content">
+                            <!-- 在路線詳情內容中添加預約時間顯示 -->
+                            <div class="route-info-row">
+                                <div class="route-info-item">
+                                    <span class="route-label">預約時間：</span>
+                                    <span class="route-value">{{ reservationForm.booking_time }}</span>
+                                </div>
+                                <div class="route-info-item">
+                                    <span class="route-label">執行日期：</span>
+                                    <span class="route-value">{{ formatDate(reservationForm.schedule_date) }}</span>
+                                </div>
+                            </div>
                             <div class="route-info-row">
                                 <div class="route-info-item">
                                     <span class="route-label">上車地區：</span>
@@ -353,11 +364,6 @@ const selectedDate = ref('')
 const today = new Date()
 const tomorrow = new Date(today)
 tomorrow.setDate(today.getDate() + 1)
-const dayAfterTomorrow = computed(() => {
-    const date = new Date(today)
-    date.setDate(today.getDate() + 2)
-    return date.toISOString().split('T')[0]
-})
 
 // 字體大小控制
 const fontSizes = [
@@ -379,7 +385,8 @@ const userSettings = ref({
         departureAddress: '裕民路61巷9號',
         arrivalArea: '三峽',
         arrivalAddress: '大埔路220號-春暉啟能中心',
-        remark: '可06:30~10:00之間，悠遊卡付款'
+        remark: '可06:30~10:00之間，悠遊卡付款',
+        booking_time: '07:15'
     },
     // 第二組地址
     group2: {
@@ -388,7 +395,8 @@ const userSettings = ref({
         departureAddress: '大埔路220號-春暉啟能中心',
         arrivalArea: '土城',
         arrivalAddress: '裕民路61巷9號',
-        remark: '可14:00~16:00之間，悠遊卡付款'
+        remark: '可14:00~16:00之間，悠遊卡付款',
+        booking_time: '14:00'
     },
     // 第三組地址
     group3: {
@@ -397,7 +405,8 @@ const userSettings = ref({
         departureAddress: '大埔路220號-春暉啟能中心',
         arrivalArea: '土城',
         arrivalAddress: '永和街61號',
-        remark: '可14:00~16:00之間，悠遊卡付款'
+        remark: '可14:00~16:00之間，悠遊卡付款',
+        booking_time: '14:00'
     }
 })
 
@@ -466,6 +475,11 @@ const applyRouteGroup = () => {
         reservationForm.value.arrival_area = group.arrivalArea
         reservationForm.value.arrival_address = group.arrivalAddress
 
+        // 使用群組的預約時間
+        if (group.booking_time) {
+            reservationForm.value.booking_time = group.booking_time
+        }
+        
         // 如果群組有備註且表單備註為空，則使用群組備註
         if (group.remark && !reservationForm.value.remark) {
             reservationForm.value.remark = group.remark
@@ -642,12 +656,12 @@ const selectDate = (date) => {
 
         reservationForm.value = {
             booking_date: date.date,
-            booking_time: '07:15',
+            booking_time: defaultGroup.booking_time || '07:15',
             departure_area: defaultGroup.departureArea || '',
             departure_address: defaultGroup.departureAddress || '',
             arrival_area: defaultGroup.arrivalArea || '',
             arrival_address: defaultGroup.arrivalAddress || '',
-            schedule_date: dayAfterTomorrow.value,
+            schedule_date: tomorrow.toISOString().split('T')[0], // 改為明天作為預設值
             remark: ''
         }
     }
@@ -663,13 +677,6 @@ const submitReservation = async () => {
     // 簡單驗證常用路線必選
     if (!selectedRouteGroup.value) {
         showToastMessage('請選擇常用路線')
-        return
-    }
-
-    // 驗證執行日期不能是今天或明天
-    const executeDate = new Date(reservationForm.value.schedule_date)
-    if (executeDate <= tomorrow) {
-        showToastMessage('執行預約日期不能是今天或明天')
         return
     }
 
