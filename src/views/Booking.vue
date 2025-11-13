@@ -246,7 +246,7 @@
         <div class="glass-container">
             <header>
                 <div class="header-content">
-                    <h1>{{ currentMonthDisplay }} 康復巴士自動化預約系統</h1>
+                    <h1>{{ currentMonthDisplay }} 復康巴士自動化預約系統</h1>
                     <div class="calendar-nav">
                         <button class="nav-btn" @click="previousMonth">&lt;</button>
                         <button class="nav-btn" @click="nextMonth">&gt;</button>
