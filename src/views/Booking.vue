@@ -8,8 +8,8 @@
         <!-- Toast 组件 -->
         <div
             v-if="showToast"
-            class="toast-container"
             :class="{ 'toast-show': showToast }"
+            class="toast-container"
         >
             <div class="toast-content">
                 <span>{{ toastMessage }}</span>
@@ -34,18 +34,18 @@
                                 <label>姓名</label>
                                 <input
                                     v-model="userSettings.user_name"
-                                    type="text"
                                     class="form-input"
                                     placeholder="請輸入姓名"
+                                    type="text"
                                 />
                             </div>
                             <div class="form-group">
                                 <label>密碼</label>
                                 <input
                                     v-model="userSettings.user_password"
-                                    type="password"
                                     class="form-input"
                                     placeholder="請輸入密碼"
+                                    type="password"
                                 />
                             </div>
                         </div>
@@ -62,18 +62,18 @@
                             <label>路線名稱</label>
                             <input
                                 v-model="userSettings[groupKey].name"
-                                type="text"
-                                class="form-input"
                                 :placeholder="getRoutePlaceholder(groupKey)"
+                                class="form-input"
+                                type="text"
                             />
                         </div>
                         <div class="form-group">
                             <label>預約時間</label>
                             <input
                                 v-model="userSettings[groupKey].booking_time"
-                                type="time"
                                 class="form-input"
                                 placeholder="請輸入預約時間"
+                                type="time"
                             />
                         </div>
                         <div class="form-row">
@@ -81,18 +81,18 @@
                                 <label>上車地區</label>
                                 <input
                                     v-model="userSettings[groupKey].departureArea"
-                                    type="text"
                                     class="form-input"
                                     placeholder="請輸入上車地區"
+                                    type="text"
                                 />
                             </div>
                             <div class="form-group">
                                 <label>上車地址</label>
                                 <input
                                     v-model="userSettings[groupKey].departureAddress"
-                                    type="text"
                                     class="form-input"
                                     placeholder="請輸入上車地址"
+                                    type="text"
                                 />
                             </div>
                         </div>
@@ -101,18 +101,18 @@
                                 <label>下車地區</label>
                                 <input
                                     v-model="userSettings[groupKey].arrivalArea"
-                                    type="text"
                                     class="form-input"
                                     placeholder="請輸入下車地區"
+                                    type="text"
                                 />
                             </div>
                             <div class="form-group">
                                 <label>下車地址</label>
                                 <input
                                     v-model="userSettings[groupKey].arrivalAddress"
-                                    type="text"
                                     class="form-input"
                                     placeholder="請輸入下車地址"
+                                    type="text"
                                 />
                             </div>
                         </div>
@@ -121,8 +121,8 @@
                             <textarea
                                 v-model="userSettings[groupKey].remark"
                                 class="form-input"
-                                rows="2"
                                 placeholder="請輸入路線相關備註"
+                                rows="2"
                             ></textarea>
                         </div>
                     </div>
@@ -146,28 +146,28 @@
                         <label>預約日期</label>
                         <input
                             v-model="reservationForm.booking_date"
-                            type="date"
                             class="form-input"
                             readonly
+                            type="date"
                         />
                     </div>
                     <div class="form-group">
                         <label>執行預約日期</label>
                         <input
                             v-model="reservationForm.schedule_date"
-                            type="date"
                             class="form-input"
+                            type="date"
                         />
                     </div>
                     <div class="form-group">
                         <label>常用路線</label>
                         <select
                             v-model="selectedRouteGroup"
-                            @change="applyRouteGroup"
                             class="select-input"
                             required
+                            @change="applyRouteGroup"
                         >
-                            <option value="" disabled>請選擇上車與下車地點</option>
+                            <option disabled value="">請選擇上車與下車地點</option>
                             <!-- 動態生成選項 - 改動位置 -->
                             <option
                                 v-for="(group, groupKey) in availableRouteGroups"
@@ -260,7 +260,7 @@
                     <div class="panel-content">
                         <div class="calendar-container">
                             <div class="weekdays">
-                                <div class="weekday" v-for="day in weekdays" :key="day">{{ day }}</div>
+                                <div v-for="day in weekdays" :key="day" class="weekday">{{ day }}</div>
                             </div>
                             <div class="calendar-grid">
                                 <div
@@ -306,8 +306,8 @@
                                 <div class="reservation-actions">
                                     <button
                                         class="btn-delete"
-                                        @click.stop="deleteReservationFromList(reservation)"
                                         title="刪除預約"
+                                        @click.stop="deleteReservationFromList(reservation)"
                                     >
                                         ×
                                     </button>
@@ -336,7 +336,8 @@
                     <button class="btn btn-outline" @click="openUserModal">
                         用戶設置
                     </button>
-                    <button class="btn btn-primary" @click="loadCacheData">
+                    <!-- 修改按鈕點擊事件 -->
+                    <button class="btn btn-primary" @click="loadBookingList">
                         載入資料
                     </button>
                 </div>
@@ -346,8 +347,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { getCacheData, updateCacheData } from '../services/api.js'
+import {computed, onMounted, ref} from 'vue'
+import {createBooking, deleteBooking, getBookingList} from '../services/api.js'
 
 // 基本狀態
 const isLoading = ref(false)
@@ -446,6 +447,8 @@ const getRoutePlaceholder = (groupKey) => {
 
 // 預約表單
 const reservationForm = ref({
+    user_name: '房有',
+    user_password: 'A078839',
     booking_date: '',
     booking_time: '07:15',
     departure_area: '',
@@ -479,7 +482,7 @@ const applyRouteGroup = () => {
         if (group.booking_time) {
             reservationForm.value.booking_time = group.booking_time
         }
-        
+
         // 如果群組有備註且表單備註為空，則使用群組備註
         if (group.remark && !reservationForm.value.remark) {
             reservationForm.value.remark = group.remark
@@ -568,52 +571,25 @@ const closeUserModal = () => {
     showUserModal.value = false
 }
 
-const saveUserSettings = async () => {
-    try {
-        isLoading.value = true
-
-        // 構建要更新的緩存數據
-        const cacheData = {
-            user_name: userSettings.value.user_name,
-            user_password: userSettings.value.user_password,
-            booking_schedules: reservations.value
-        }
-
-        await updateCacheData(cacheData)
-        showToastMessage('用戶設置已保存')
-        closeUserModal()
-    } catch (error) {
-        showToastMessage('保存用戶設置失敗')
-    } finally {
-        isLoading.value = false
-    }
+const saveUserSettings = () => {
+    // 用戶設置不需要保存到後端，直接關閉彈窗
+    showToastMessage('用戶設置已保存')
+    closeUserModal()
 }
 
-const loadCacheData = async () => {
+const loadBookingList = async () => {
     try {
         isLoading.value = true
-        const response = await getCacheData()
+        const response = await getBookingList()
 
         if (response.success) {
-            const data = response.data
-
-            // 更新用戶設置
-            if (data.user_name) {
-                userSettings.value.user_name = data.user_name
-            }
-            if (data.user_password) {
-                userSettings.value.user_password = data.user_password
-            }
-
-            // 直接使用預約數據，不處理狀態
-            reservations.value = data.booking_schedules || []
-
+            reservations.value = response.data || []
             showToastMessage('資料載入成功')
         } else {
-            showToastMessage('載入資料失敗')
+            showToastMessage(response.message || '載入資料失敗')
         }
     } catch (error) {
-        console.error('載入緩存資料失敗:', error)
+        console.error('載入預約列表失敗:', error)
         showToastMessage('載入資料失敗')
     } finally {
         isLoading.value = false
@@ -648,7 +624,7 @@ const selectDate = (date) => {
         }
 
         // 填充預約表單
-        reservationForm.value = { ...date.reservation }
+        reservationForm.value = {...date.reservation}
     } else {
         // 新建預約，使用第一個可用路線作為預設值 - 改動位置
         const firstAvailableGroup = Object.keys(availableRouteGroups.value)[0]
@@ -674,7 +650,6 @@ const closeReservationModal = () => {
 }
 
 const submitReservation = async () => {
-    // 簡單驗證常用路線必選
     if (!selectedRouteGroup.value) {
         showToastMessage('請選擇常用路線')
         return
@@ -684,29 +659,26 @@ const submitReservation = async () => {
         isLoading.value = true
 
         if (existingReservation.value) {
-            // 更新現有預約
-            const index = reservations.value.findIndex(r => r.booking_date === selectedDate.value)
-            if (index !== -1) {
-                reservations.value[index] = { ...reservationForm.value }
+            // 更新：先刪除再創建
+            await deleteBooking(existingReservation.value)
+            const response = await createBooking(reservationForm.value)
+
+            if (response.success) {
+                showToastMessage('預約已更新')
+                await loadBookingList()
+            } else {
+                showToastMessage(response.message || '更新預約失敗')
             }
         } else {
             // 新增預約
-            reservations.value.push({ ...reservationForm.value })
-        }
+            const response = await createBooking(reservationForm.value)
 
-        // 統一使用 updateCacheData 同步到服務器
-        const cacheData = {
-            user_name: userSettings.value.user_name,
-            user_password: userSettings.value.user_password,
-            booking_schedules: reservations.value
-        }
-
-        const response = await updateCacheData(cacheData)
-
-        if (response.success) {
-            showToastMessage(response.message || '預約已提交')
-        } else {
-            showToastMessage('預約失敗')
+            if (response.success) {
+                showToastMessage('預約已創建')
+                await loadBookingList()
+            } else {
+                showToastMessage(response.message || '創建預約失敗')
+            }
         }
 
         closeReservationModal()
@@ -723,26 +695,13 @@ const deleteReservation = async () => {
 
     try {
         isLoading.value = true
-
-        // 從本地數據中移除預約
-        const index = reservations.value.findIndex(r => r.booking_date === selectedDate.value)
-        if (index !== -1) {
-            reservations.value.splice(index, 1)
-        }
-
-        // 同步到服務器
-        const cacheData = {
-            user_name: userSettings.value.user_name,
-            user_password: userSettings.value.user_password,
-            booking_schedules: reservations.value
-        }
-
-        const response = await updateCacheData(cacheData)
+        const response = await deleteBooking(existingReservation.value)
 
         if (response.success) {
             showToastMessage('預約已刪除')
+            await loadBookingList()
         } else {
-            showToastMessage('刪除預約失敗')
+            showToastMessage(response.message || '刪除預約失敗')
         }
 
         closeReservationModal()
@@ -757,26 +716,13 @@ const deleteReservation = async () => {
 const deleteReservationFromList = async (reservation) => {
     try {
         isLoading.value = true
-
-        // 從本地數據中移除預約
-        const index = reservations.value.findIndex(r => r.booking_date === reservation.booking_date)
-        if (index !== -1) {
-            reservations.value.splice(index, 1)
-        }
-
-        // 同步到服務器
-        const cacheData = {
-            user_name: userSettings.value.user_name,
-            user_password: userSettings.value.user_password,
-            booking_schedules: reservations.value
-        }
-
-        const response = await updateCacheData(cacheData)
+        const response = await deleteBooking(reservation)
 
         if (response.success) {
             showToastMessage('預約已刪除')
+            await loadBookingList()
         } else {
-            showToastMessage('刪除預約失敗')
+            showToastMessage(response.message || '刪除預約失敗')
         }
     } catch (error) {
         console.error('刪除預約失敗:', error)
@@ -789,7 +735,7 @@ const deleteReservationFromList = async (reservation) => {
 const viewReservation = (reservation) => {
     selectedDate.value = reservation.booking_date
     existingReservation.value = reservation
-    reservationForm.value = { ...reservation }
+    reservationForm.value = {...reservation}
 
     // 動態查找匹配的路線組 - 改動位置
     const matchingGroup = findMatchingRouteGroup(reservation)
@@ -830,7 +776,7 @@ const getDateClass = (date) => {
 
 // 組件掛載時載入數據
 onMounted(() => {
-    loadCacheData()
+    loadBookingList()
 })
 </script>
 
@@ -1361,8 +1307,12 @@ textarea.form-input {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* Toast 樣式 */

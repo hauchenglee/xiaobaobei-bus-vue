@@ -57,7 +57,7 @@ jobs:
           port: 22
           script: |
             docker pull hauchenglee/xiaobaobei-bus-vue:${{ needs.build-and-push-docker.outputs.tag }}
-            cd /opt/xiaobaobei-bus
+            cd /opt/xiaobaobei-server
             echo "VERSION=${{ needs.build-and-push-docker.outputs.tag }}" > .env
             docker compose pull vue
             docker compose up -d vue
