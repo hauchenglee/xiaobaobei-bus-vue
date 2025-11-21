@@ -33,7 +33,7 @@
                             <div class="form-group">
                                 <label>姓名</label>
                                 <input
-                                    v-model="userSettings.user_name"
+                                    v-model="userSettings.userName"
                                     class="form-input"
                                     placeholder="請輸入姓名"
                                     type="text"
@@ -42,7 +42,7 @@
                             <div class="form-group">
                                 <label>密碼</label>
                                 <input
-                                    v-model="userSettings.user_password"
+                                    v-model="userSettings.userPassword"
                                     class="form-input"
                                     placeholder="請輸入密碼"
                                     type="password"
@@ -70,7 +70,7 @@
                         <div class="form-group">
                             <label>預約時間</label>
                             <input
-                                v-model="userSettings[groupKey].booking_time"
+                                v-model="userSettings[groupKey].bookingTime"
                                 class="form-input"
                                 placeholder="請輸入預約時間"
                                 type="time"
@@ -145,7 +145,7 @@
                     <div class="form-group">
                         <label>預約日期</label>
                         <input
-                            v-model="reservationForm.booking_date"
+                            v-model="reservationForm.bookingDate"
                             class="form-input"
                             readonly
                             type="date"
@@ -154,7 +154,7 @@
                     <div class="form-group">
                         <label>執行預約日期</label>
                         <input
-                            v-model="reservationForm.schedule_date"
+                            v-model="reservationForm.scheduleDate"
                             class="form-input"
                             type="date"
                         />
@@ -189,31 +189,31 @@
                             <div class="route-info-row">
                                 <div class="route-info-item">
                                     <span class="route-label">預約時間：</span>
-                                    <span class="route-value">{{ reservationForm.booking_time }}</span>
+                                    <span class="route-value">{{ reservationForm.bookingTime }}</span>
                                 </div>
                                 <div class="route-info-item">
                                     <span class="route-label">執行日期：</span>
-                                    <span class="route-value">{{ formatDate(reservationForm.schedule_date) }}</span>
+                                    <span class="route-value">{{ formatDate(reservationForm.scheduleDate) }}</span>
                                 </div>
                             </div>
                             <div class="route-info-row">
                                 <div class="route-info-item">
                                     <span class="route-label">上車地區：</span>
-                                    <span class="route-value">{{ reservationForm.departure_area }}</span>
+                                    <span class="route-value">{{ reservationForm.departureArea }}</span>
                                 </div>
                                 <div class="route-info-item">
                                     <span class="route-label">上車地址：</span>
-                                    <span class="route-value">{{ reservationForm.departure_address }}</span>
+                                    <span class="route-value">{{ reservationForm.departureAddress }}</span>
                                 </div>
                             </div>
                             <div class="route-info-row">
                                 <div class="route-info-item">
                                     <span class="route-label">下車地區：</span>
-                                    <span class="route-value">{{ reservationForm.arrival_area }}</span>
+                                    <span class="route-value">{{ reservationForm.arrivalArea }}</span>
                                 </div>
                                 <div class="route-info-item">
                                     <span class="route-label">下車地址：</span>
-                                    <span class="route-value">{{ reservationForm.arrival_address }}</span>
+                                    <span class="route-value">{{ reservationForm.arrivalAddress }}</span>
                                 </div>
                             </div>
                             <div class="route-info-row">
@@ -285,18 +285,18 @@
                         <div v-if="monthReservations.length > 0" class="reservations-list">
                             <div
                                 v-for="reservation in monthReservations"
-                                :key="reservation.booking_date"
+                                :key="reservation.bookingDate"
                                 class="reservation-item"
                             >
                                 <div class="reservation-content" @click="viewReservation(reservation)">
-                                    <div class="reservation-date">{{ formatDate(reservation.booking_date) }}</div>
+                                    <div class="reservation-date">{{ formatDate(reservation.bookingDate) }}</div>
                                     <div class="reservation-details">
-                                        <div class="reservation-trip">{{ reservation.booking_time || '未設定時間' }}</div>
+                                        <div class="reservation-trip">{{ reservation.bookingTime || '未設定時間' }}</div>
                                         <div class="reservation-route">
-                                            {{ reservation.departure_address }} → {{ reservation.arrival_address }}
+                                            {{ reservation.departureAddress }} → {{ reservation.arrivalAddress }}
                                         </div>
                                         <div class="reservation-execute">
-                                            執行日期：{{ formatDate(reservation.schedule_date) }}
+                                            執行日期：{{ formatDate(reservation.scheduleDate) }}
                                         </div>
                                         <div v-if="reservation.remark" class="reservation-remark">
                                             備註：{{ reservation.remark }}
@@ -377,8 +377,8 @@ const currentFontSize = ref('1.5rem');
 
 // 用戶設置
 const userSettings = ref({
-    user_name: '房有',
-    user_password: 'A078839',
+    userName: '房有',
+    userPassword: 'A078839',
     // 第一組地址
     group1: {
         name: '裕民路上車，三峽下車',
@@ -387,7 +387,7 @@ const userSettings = ref({
         arrivalArea: '三峽',
         arrivalAddress: '大埔路220號-春暉啟能中心',
         remark: '可06:30~10:00之間，悠遊卡付款',
-        booking_time: '07:15'
+        bookingTime: '07:15'
     },
     // 第二組地址
     group2: {
@@ -397,7 +397,7 @@ const userSettings = ref({
         arrivalArea: '土城',
         arrivalAddress: '裕民路61巷9號',
         remark: '可14:00~16:00之間，悠遊卡付款',
-        booking_time: '14:00'
+        bookingTime: '14:00'
     },
     // 第三組地址
     group3: {
@@ -407,7 +407,7 @@ const userSettings = ref({
         arrivalArea: '土城',
         arrivalAddress: '永和街61號',
         remark: '可14:00~16:00之間，悠遊卡付款',
-        booking_time: '14:00'
+        bookingTime: '14:00'
     }
 })
 
@@ -447,15 +447,15 @@ const getRoutePlaceholder = (groupKey) => {
 
 // 預約表單
 const reservationForm = ref({
-    user_name: '房有',
-    user_password: 'A078839',
-    booking_date: '',
-    booking_time: '07:15',
-    departure_area: '',
-    departure_address: '',
-    arrival_area: '',
-    arrival_address: '',
-    schedule_date: '',
+    userName: '房有',
+    userPassword: 'A078839',
+    bookingDate: '',
+    bookingTime: '07:15',
+    departureArea: '',
+    departureAddress: '',
+    arrivalArea: '',
+    arrivalAddress: '',
+    scheduleDate: '',
     remark: ''
 })
 
@@ -473,14 +473,14 @@ const applyRouteGroup = () => {
 
     const group = userSettings.value[selectedRouteGroup.value]
     if (group) {
-        reservationForm.value.departure_area = group.departureArea
-        reservationForm.value.departure_address = group.departureAddress
-        reservationForm.value.arrival_area = group.arrivalArea
-        reservationForm.value.arrival_address = group.arrivalAddress
+        reservationForm.value.departureArea = group.departureArea
+        reservationForm.value.departureAddress = group.departureAddress
+        reservationForm.value.arrivalArea = group.arrivalArea
+        reservationForm.value.arrivalAddress = group.arrivalAddress
 
         // 使用群組的預約時間
-        if (group.booking_time) {
-            reservationForm.value.booking_time = group.booking_time
+        if (group.bookingTime) {
+            reservationForm.value.bookingTime = group.bookingTime
         }
 
         // 如果群組有備註且表單備註為空，則使用群組備註
@@ -507,8 +507,8 @@ const monthReservations = computed(() => {
     const year = currentDate.value.getFullYear()
     const month = currentDate.value.getMonth() + 1
     return reservations.value.filter(r => {
-        if (!r.booking_date) return false
-        const [rYear, rMonth] = r.booking_date.split('-').map(Number)
+        if (!r.bookingDate) return false
+        const [rYear, rMonth] = r.bookingDate.split('-').map(Number)
         return rYear === year && rMonth === month
     })
 })
@@ -528,7 +528,7 @@ const calendarDates = computed(() => {
 
     for (let i = 0; i < 42; i++) {
         const dateStr = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}-${String(current.getDate()).padStart(2, '0')}`
-        const reservation = reservations.value.find(r => r.booking_date === dateStr)
+        const reservation = reservations.value.find(r => r.bookingDate === dateStr)
 
         // 不能預約今天、明天及過去的日期
         const isNotBookable = current <= tomorrow
@@ -599,8 +599,8 @@ const loadBookingList = async () => {
 // 新增：動態查找路線組的方法 - 改動位置
 const findMatchingRouteGroup = (reservation) => {
     for (const [groupKey, group] of Object.entries(routeGroups.value)) {
-        if (group.departureArea === reservation.departure_area &&
-            group.departureAddress === reservation.departure_address) {
+        if (group.departureArea === reservation.departureArea &&
+            group.departureAddress === reservation.departureAddress) {
             return groupKey
         }
     }
@@ -631,13 +631,13 @@ const selectDate = (date) => {
         const defaultGroup = firstAvailableGroup ? userSettings.value[firstAvailableGroup] : userSettings.value.group1
 
         reservationForm.value = {
-            booking_date: date.date,
-            booking_time: defaultGroup.booking_time || '07:15',
-            departure_area: defaultGroup.departureArea || '',
-            departure_address: defaultGroup.departureAddress || '',
-            arrival_area: defaultGroup.arrivalArea || '',
-            arrival_address: defaultGroup.arrivalAddress || '',
-            schedule_date: tomorrow.toISOString().split('T')[0], // 改為明天作為預設值
+            bookingDate: date.date,
+            bookingTime: defaultGroup.bookingTime || '07:15',
+            departureArea: defaultGroup.departureArea || '',
+            departureAddress: defaultGroup.departureAddress || '',
+            arrivalArea: defaultGroup.arrivalArea || '',
+            arrivalAddress: defaultGroup.arrivalAddress || '',
+            scheduleDate: tomorrow.toISOString().split('T')[0], // 改為明天作為預設值
             remark: ''
         }
     }
@@ -733,7 +733,7 @@ const deleteReservationFromList = async (reservation) => {
 }
 
 const viewReservation = (reservation) => {
-    selectedDate.value = reservation.booking_date
+    selectedDate.value = reservation.bookingDate
     existingReservation.value = reservation
     reservationForm.value = {...reservation}
 
