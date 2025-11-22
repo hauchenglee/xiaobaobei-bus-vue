@@ -397,7 +397,7 @@ const userSettings = ref({
         arrivalArea: '土城',
         arrivalAddress: '裕民路61巷9號',
         remark: '可14:00~16:00之間，悠遊卡付款',
-        bookingTime: '14:00'
+        bookingTime: '15:00'
     },
     // 第三組地址
     group3: {
@@ -407,7 +407,7 @@ const userSettings = ref({
         arrivalArea: '土城',
         arrivalAddress: '永和街61號',
         remark: '可14:00~16:00之間，悠遊卡付款',
-        bookingTime: '14:00'
+        bookingTime: '15:00'
     }
 })
 
