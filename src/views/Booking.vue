@@ -447,6 +447,7 @@ const getRoutePlaceholder = (groupKey) => {
 
 // 預約表單
 const reservationForm = ref({
+    id: null,
     userName: '房有',
     userPassword: 'A078839',
     bookingDate: '',
@@ -519,7 +520,6 @@ const calendarDates = computed(() => {
     const year = currentDate.value.getFullYear()
     const month = currentDate.value.getMonth()
     const firstDay = new Date(year, month, 1)
-    const lastDay = new Date(year, month + 1, 0)
     const startDate = new Date(firstDay)
     startDate.setDate(startDate.getDate() - firstDay.getDay())
 
@@ -558,9 +558,12 @@ const setFontSize = (size) => {
 const showToastMessage = (message, duration = 2000) => {
     toastMessage.value = message
     showToast.value = true
-    setTimeout(() => {
-        showToast.value = false
-    }, duration)
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            showToast.value = false
+            resolve()
+        }, duration)
+    })
 }
 
 const openUserModal = () => {
@@ -582,17 +585,28 @@ const loadBookingList = async () => {
         isLoading.value = true
         const response = await getBookingList()
 
-        if (response.success) {
+        if (response.code === 'A0001') {
             reservations.value = response.data || []
-            showToastMessage('資料載入成功')
+            await showToastMessage('資料載入成功')
         } else {
-            showToastMessage(response.message || '載入資料失敗')
+            await showToastMessage(response.message || '載入資料失敗')
         }
     } catch (error) {
         console.error('載入預約列表失敗:', error)
-        showToastMessage('載入資料失敗')
+        await showToastMessage('載入資料失敗')
     } finally {
         isLoading.value = false
+    }
+}
+
+const loadBookingListSilently = async () => {
+    try {
+        const response = await getBookingList()
+        if (response.code === 'A0001') {
+            reservations.value = response.data || []
+        }
+    } catch (error) {
+        console.error('載入預約列表失敗:', error)
     }
 }
 
@@ -631,6 +645,9 @@ const selectDate = (date) => {
         const defaultGroup = firstAvailableGroup ? userSettings.value[firstAvailableGroup] : userSettings.value.group1
 
         reservationForm.value = {
+            id: null,  // 新增：設置 id 為 null
+            userName: userSettings.value.userName,  // 改：使用 userSettings 的值
+            userPassword: userSettings.value.userPassword,  // 改：使用 userSettings 的值
             bookingDate: date.date,
             bookingTime: defaultGroup.bookingTime || '07:15',
             departureArea: defaultGroup.departureArea || '',
@@ -663,9 +680,9 @@ const submitReservation = async () => {
             await deleteBooking(existingReservation.value)
             const response = await createBooking(reservationForm.value)
 
-            if (response.success) {
-                showToastMessage('預約已更新')
-                await loadBookingList()
+            if (response.code === 'A0001') {
+                await showToastMessage('預約已更新')
+                await loadBookingListSilently()
             } else {
                 showToastMessage(response.message || '更新預約失敗')
             }
@@ -673,9 +690,9 @@ const submitReservation = async () => {
             // 新增預約
             const response = await createBooking(reservationForm.value)
 
-            if (response.success) {
-                showToastMessage('預約已創建')
-                await loadBookingList()
+            if (response.code === 'A0001') {
+                await showToastMessage('預約已創建')
+                await loadBookingListSilently()
             } else {
                 showToastMessage(response.message || '創建預約失敗')
             }
@@ -697,9 +714,9 @@ const deleteReservation = async () => {
         isLoading.value = true
         const response = await deleteBooking(existingReservation.value)
 
-        if (response.success) {
-            showToastMessage('預約已刪除')
-            await loadBookingList()
+        if (response.code === 'A0001') {
+            await showToastMessage('預約已刪除')
+            await loadBookingListSilently()
         } else {
             showToastMessage(response.message || '刪除預約失敗')
         }
@@ -718,9 +735,9 @@ const deleteReservationFromList = async (reservation) => {
         isLoading.value = true
         const response = await deleteBooking(reservation)
 
-        if (response.success) {
-            showToastMessage('預約已刪除')
-            await loadBookingList()
+        if (response.code === 'A0001') {
+            await showToastMessage('預約已刪除')
+            await loadBookingListSilently()
         } else {
             showToastMessage(response.message || '刪除預約失敗')
         }
