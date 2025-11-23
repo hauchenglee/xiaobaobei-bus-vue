@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://srv415056.hstgr.cloud:8080'
+const API_BASE_URL = 'http://srv415056.hstgr.cloud:8082'
 
 // 獲取預約列表
 export const getBookingList = async () => {
