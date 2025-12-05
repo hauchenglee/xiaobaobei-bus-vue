@@ -1,9 +1,9 @@
-const API_BASE_URL = 'https://srv415056.hstgr.cloud/api'
+const API_BASE_URL = 'http://srv415056.hstgr.cloud:8080'
 
 // 獲取預約列表
 export const getBookingList = async () => {
     try {
-        const response = await fetch(`${API_BASE_URL}/booking/getList`, {
+        const response = await fetch(`${API_BASE_URL}/api/booking/getList`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -24,7 +24,7 @@ export const getBookingList = async () => {
 // 創建預約
 export const createBooking = async (bookingData) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/booking/create`, {
+        const response = await fetch(`${API_BASE_URL}/api/booking/create`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -46,7 +46,7 @@ export const createBooking = async (bookingData) => {
 // 刪除預約
 export const deleteBooking = async (bookingData) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/booking/delete`, {
+        const response = await fetch(`${API_BASE_URL}/api/booking/delete`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ export const deleteBooking = async (bookingData) => {
 // 測試預約
 export const testBooking = async () => {
     try {
-        const response = await fetch(`${API_BASE_URL}/booking/test`, {
+        const response = await fetch(`${API_BASE_URL}/api/booking/test`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
