@@ -585,7 +585,7 @@ const loadBookingList = async () => {
         isLoading.value = true
         const response = await getBookingList()
 
-        if (response.code === 'A0001') {
+        if (response.code === '200') {
             reservations.value = response.data || []
             await showToastMessage('資料載入成功')
         } else {
@@ -602,7 +602,7 @@ const loadBookingList = async () => {
 const loadBookingListSilently = async () => {
     try {
         const response = await getBookingList()
-        if (response.code === 'A0001') {
+        if (response.code === '200') {
             reservations.value = response.data || []
         }
     } catch (error) {
@@ -680,7 +680,7 @@ const submitReservation = async () => {
             await deleteBooking(existingReservation.value)
             const response = await createBooking(reservationForm.value)
 
-            if (response.code === 'A0001') {
+            if (response.code === '200') {
                 await showToastMessage('預約已更新')
                 await loadBookingListSilently()
             } else {
@@ -690,7 +690,7 @@ const submitReservation = async () => {
             // 新增預約
             const response = await createBooking(reservationForm.value)
 
-            if (response.code === 'A0001') {
+            if (response.code === '200') {
                 await showToastMessage('預約已創建')
                 await loadBookingListSilently()
             } else {
@@ -714,7 +714,7 @@ const deleteReservation = async () => {
         isLoading.value = true
         const response = await deleteBooking(existingReservation.value)
 
-        if (response.code === 'A0001') {
+        if (response.code === '200') {
             await showToastMessage('預約已刪除')
             await loadBookingListSilently()
         } else {
@@ -735,7 +735,7 @@ const deleteReservationFromList = async (reservation) => {
         isLoading.value = true
         const response = await deleteBooking(reservation)
 
-        if (response.code === 'A0001') {
+        if (response.code === '200') {
             await showToastMessage('預約已刪除')
             await loadBookingListSilently()
         } else {

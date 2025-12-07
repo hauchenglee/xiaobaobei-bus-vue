@@ -58,6 +58,6 @@ jobs:
           script: |
             cd /opt/xiaobaobei-server
             echo "VERSION=${{ needs.build-and-push-docker.outputs.tag }}" > .env
-            docker compose pull vue
-            docker compose down vue
-            docker compose up -d vue
+            docker compose pull vue2
+            docker compose down vue2
+            docker compose up -d vue2
