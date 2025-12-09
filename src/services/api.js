@@ -1,8 +1,10 @@
-const API_BASE_URL = 'http://srv415056.hstgr.cloud:8080'
+// [修改] 改為相對路徑
+const API_BASE_URL = ''
 
 // 獲取預約列表
 export const getBookingList = async () => {
     try {
+        // 請求路徑：/api/booking/getList
         const response = await fetch(`${API_BASE_URL}/api/booking/getList`, {
             method: 'POST',
             headers: {
