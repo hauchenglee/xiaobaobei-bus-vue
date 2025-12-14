@@ -4,8 +4,7 @@ const API_BASE_URL = ''
 // 獲取預約列表
 export const getBookingList = async () => {
     try {
-        // 請求路徑：/api/booking/getList
-        const response = await fetch(`${API_BASE_URL}/api/booking/getList`, {
+        const response = await fetch(`${API_BASE_URL}/api/bus/getList`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -26,7 +25,7 @@ export const getBookingList = async () => {
 // 創建預約
 export const createBooking = async (bookingData) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/booking/create`, {
+        const response = await fetch(`${API_BASE_URL}/api/bus/create`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -48,7 +47,7 @@ export const createBooking = async (bookingData) => {
 // 刪除預約
 export const deleteBooking = async (bookingData) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/booking/delete`, {
+        const response = await fetch(`${API_BASE_URL}/api/bus/delete`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -70,7 +69,7 @@ export const deleteBooking = async (bookingData) => {
 // 測試預約
 export const testBooking = async () => {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/booking/test`, {
+        const response = await fetch(`${API_BASE_URL}/api/bus/test`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
