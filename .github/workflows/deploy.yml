@@ -57,8 +57,12 @@ jobs:
           port: 22
           script: |
             cd /opt/xiaobaobei-server
-            # 使用 sed 替換 VUE_BUS_VERSION 的值
-            sed -i "s/^VUE_BUS_VERSION=.*/VUE_BUS_VERSION=${{ needs.build-and-push-docker.outputs.tag }}/" .env
+            # 使用 sed 替換 VUE_BUS_VERSION 的值；如果不存在則新增
+            if grep -q "^VUE_BUS_VERSION=" .env; then
+              sed -i "s/^VUE_BUS_VERSION=.*/VUE_BUS_VERSION=${{ needs.build-and-push-docker.outputs.tag }}/" .env
+            else
+              echo "VUE_BUS_VERSION=${{ needs.build-and-push-docker.outputs.tag }}" >> .env
+            fi
             
             # 檢查修改結果 (選用)
             grep "VUE_BUS_VERSION" .env
