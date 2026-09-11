@@ -1,5 +1,4 @@
-// [修改] 改為相對路徑
-const API_BASE_URL = ''
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
 
 // 獲取預約列表
 export const getBookingList = async () => {
