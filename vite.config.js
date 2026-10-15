@@ -15,7 +15,7 @@ export default defineConfig(({ command, mode }) => {
     const hmrHost = env.VITE_DEV_HMR_HOST
 
     return {
-        base: env.VITE_APP_BASE_PATH || '/bus-v/',
+        base: env.VITE_APP_BASE_PATH || '/',
 
         plugins: [
             vue(),
